@@ -165,16 +165,22 @@ class AndroidTracksDataSource(private val context: Context) : ITracksDataSource 
     ) {
         val selection = "${Audio.Media._ID} = ?"
         val selectionArgs = arrayOf(id.toString())
-        val query =
-            context.contentResolver.query(collection, projection, selection, selectionArgs, null)
         try {
-            query?.use { cursor ->
+            val query =
+                context.contentResolver.query(collection, projection, selection, selectionArgs, null)
+
+            if (query == null) {
+                onError(Exception("Query failed, returned null cursor."))
+                return
+            }
+
+            query.use { cursor ->
                 val nameColumnIndex = cursor.getColumnIndexOrThrow(Audio.Media.DISPLAY_NAME)
                 val artistColumIndex = cursor.getColumnIndexOrThrow(Audio.Media.ARTIST)
                 val albumIdColumnIndex = cursor.getColumnIndexOrThrow(Audio.Media.ALBUM_ID)
                 val trackDurationColumnIndex = cursor.getColumnIndexOrThrow(Audio.Media.DURATION)
 
-                while (cursor.moveToNext()) {
+                if (cursor.moveToNext()) {
                     val name = cursor.getStringOrNull(nameColumnIndex) ?: "undefined"
                     val artist = cursor.getStringOrNull(artistColumIndex) ?: "undefined"
                     val albumId = cursor.getLongOrNull(albumIdColumnIndex)
@@ -197,12 +203,13 @@ class AndroidTracksDataSource(private val context: Context) : ITracksDataSource 
                         },
                     )
                     onSuccess(track)
+                } else {
+                    onError(Exception("Track with id $id not found."))
                 }
             }
         } catch (e: Exception) {
             onError(e)
         }
-
     }
 
     private fun getAudioBytes(

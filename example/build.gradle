@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
-    ndkVersion "21.1.6352462"
+    ndkVersion "27.0.12077973"
 
     defaultConfig {
         applicationId "linc.com.example"

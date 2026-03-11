@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 android {
     namespace 'linc.com.amplituda'
     compileSdkVersion 34
-    ndkVersion "21.1.6352462"
+    ndkVersion "27.0.12077973"
 
     defaultConfig {
         minSdkVersion 21
